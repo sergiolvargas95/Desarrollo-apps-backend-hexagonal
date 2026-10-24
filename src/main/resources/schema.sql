@@ -31,3 +31,21 @@ VALUES (
     'ACTIVE'
 );
 
+
+
+-- =============================================
+-- Tabla de Cursos
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS cursos (
+    id          VARCHAR(36)  NOT NULL PRIMARY KEY,
+    nombre      VARCHAR(150) NOT NULL,
+    codigo       VARCHAR(50)  NOT NULL UNIQUE,
+    descripcion TEXT         NOT NULL,
+    institucion VARCHAR(150) NOT NULL,
+    ubicacion   VARCHAR(255) NOT NULL,
+    modalidad   ENUM('VIRTUAL', 'PRESENCIAL', 'SEMIPRESENCIAL') NOT NULL,
+    nivel       ENUM('BASICO', 'INTERMEDIO', 'AVANZADO')        NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

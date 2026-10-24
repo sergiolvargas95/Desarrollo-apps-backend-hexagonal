@@ -5,6 +5,7 @@ import com.jcaa.usersmanagement.application.port.out.GetAllUsersPort;
 import com.jcaa.usersmanagement.application.port.out.GetUserByEmailPort;
 import com.jcaa.usersmanagement.application.port.out.GetUserByIdPort;
 import com.jcaa.usersmanagement.application.port.out.SaveUserPort;
+import com.jcaa.usersmanagement.application.port.out.SearchUsersPort;
 import com.jcaa.usersmanagement.application.port.out.UpdateUserPort;
 import com.jcaa.usersmanagement.domain.exception.UserNotFoundException;
 import com.jcaa.usersmanagement.domain.model.UserModel;
@@ -22,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +36,8 @@ public class UserRepositoryMySQL
         GetUserByIdPort,
         GetUserByEmailPort,
         GetAllUsersPort,
-        DeleteUserPort {
+        DeleteUserPort,
+        SearchUsersPort {
 
   private static final String SQL_INSERT =
       "INSERT INTO users "
@@ -59,6 +62,10 @@ public class UserRepositoryMySQL
       "SELECT id, name, email, password, role, status, created_at, updated_at "
       + "FROM users "
       + "ORDER BY name ASC";
+
+  private static final String SQL_SEARCH_BASE =
+      "SELECT id, name, email, password, role, status, created_at, updated_at "
+      + "FROM users";
 
   private static final String SQL_DELETE =
         "DELETE FROM users "
@@ -114,6 +121,44 @@ public class UserRepositoryMySQL
   public List<UserModel> getAll() {
     try (final Connection connection = dataSource.getConnection();
          final PreparedStatement statement = connection.prepareStatement(SQL_SELECT_ALL)) {
+      final ResultSet resultSet = statement.executeQuery();
+      return UserPersistenceMapper.fromResultSetToModelList(resultSet);
+    } catch (final SQLException exception) {
+      throw PersistenceException.becauseFindAllFailed(exception);
+    }
+  }
+
+  @Override
+  public List<UserModel> search(
+      final Optional<String> nombre, final Optional<String> email) {
+
+    final List<String> conditions = new ArrayList<>();
+    if (nombre.isPresent()) {
+      conditions.add("name LIKE ?");
+    }
+    if (email.isPresent()) {
+      conditions.add("email LIKE ?");
+    }
+
+    final String sql =
+        conditions.isEmpty()
+            ? SQL_SEARCH_BASE + " ORDER BY name ASC"
+            : SQL_SEARCH_BASE
+                + " WHERE "
+                + String.join(" AND ", conditions)
+                + " ORDER BY name ASC";
+
+    try (final Connection connection = dataSource.getConnection();
+         final PreparedStatement statement = connection.prepareStatement(sql)) {
+
+      int paramIndex = 1;
+      if (nombre.isPresent()) {
+        statement.setString(paramIndex++, "%" + nombre.get() + "%");
+      }
+      if (email.isPresent()) {
+        statement.setString(paramIndex, "%" + email.get() + "%");
+      }
+
       final ResultSet resultSet = statement.executeQuery();
       return UserPersistenceMapper.fromResultSetToModelList(resultSet);
     } catch (final SQLException exception) {

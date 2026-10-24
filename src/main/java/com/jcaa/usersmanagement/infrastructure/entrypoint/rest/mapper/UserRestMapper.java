@@ -4,6 +4,7 @@ import com.jcaa.usersmanagement.application.service.dto.command.CreateUserComman
 import com.jcaa.usersmanagement.application.service.dto.command.DeleteUserCommand;
 import com.jcaa.usersmanagement.application.service.dto.command.UpdateUserCommand;
 import com.jcaa.usersmanagement.application.service.dto.query.GetUserByIdQuery;
+import com.jcaa.usersmanagement.application.service.dto.query.SearchUsersQuery;
 import com.jcaa.usersmanagement.domain.model.UserModel;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.CreateUserRestRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.UpdateUserRestRequest;
@@ -36,6 +37,10 @@ public class UserRestMapper {
 
   public GetUserByIdQuery toGetByIdQuery(final String id) {
     return new GetUserByIdQuery(id);
+  }
+
+  public SearchUsersQuery toSearchQuery(final String nombre, final String email) {
+    return new SearchUsersQuery(nombre, email);
   }
 
   public DeleteUserCommand toDeleteCommand(final String id) {

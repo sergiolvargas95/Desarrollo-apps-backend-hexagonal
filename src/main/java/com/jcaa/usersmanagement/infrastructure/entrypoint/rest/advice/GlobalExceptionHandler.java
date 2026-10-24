@@ -1,5 +1,7 @@
 package com.jcaa.usersmanagement.infrastructure.entrypoint.rest.advice;
 
+import com.jcaa.usersmanagement.domain.exception.CursoAlreadyExistsException;
+import com.jcaa.usersmanagement.domain.exception.CursoNotFoundException;
 import com.jcaa.usersmanagement.domain.exception.DomainException;
 import com.jcaa.usersmanagement.domain.exception.InvalidCredentialsException;
 import com.jcaa.usersmanagement.domain.exception.UserAlreadyExistsException;
@@ -27,6 +29,18 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(UserAlreadyExistsException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   public ApiErrorResponse handleUserAlreadyExists(final UserAlreadyExistsException exception) {
+    return new ApiErrorResponse(HttpStatus.CONFLICT.value(), exception.getMessage());
+  }
+
+  @ExceptionHandler(CursoNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ApiErrorResponse handleCursoNotFound(final CursoNotFoundException exception) {
+    return new ApiErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+  }
+
+  @ExceptionHandler(CursoAlreadyExistsException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ApiErrorResponse handleCursoAlreadyExists(final CursoAlreadyExistsException exception) {
     return new ApiErrorResponse(HttpStatus.CONFLICT.value(), exception.getMessage());
   }
 

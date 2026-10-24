@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Contrato OpenAPI / Swagger para {@link UserRestController}.
@@ -92,6 +93,40 @@ public interface UserRestControllerDocs {
                 schema = @Schema(implementation = ApiErrorResponse.class)))
   })
   List<UserRestResponse> getAll();
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // GET /api/users/search?nombre=&email=
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  @Operation(
+      summary = "Buscar usuarios por nombre y/o email",
+      description =
+          "Filtra usuarios usando búsqueda parcial (contiene) sobre nombre, email o ambos. "
+              + "Si no se envía ningún parámetro, retorna todos los usuarios. "
+              + "Ejemplo: nombre=ser encuentra 'Sergio' y 'Sergeant'.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Lista de usuarios que coinciden con los filtros. Puede ser vacía.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                array = @ArraySchema(schema = @Schema(implementation = UserRestResponse.class)))),
+    @ApiResponse(
+        responseCode = "500",
+        description = "Error interno del servidor.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class)))
+  })
+  List<UserRestResponse> search(
+      @Parameter(description = "Fragmento del nombre a buscar.", example = "Sergio")
+          @RequestParam(required = false)
+          String nombre,
+      @Parameter(description = "Fragmento del email a buscar.", example = "gmail")
+          @RequestParam(required = false)
+          String email);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // GET /api/users/{id}

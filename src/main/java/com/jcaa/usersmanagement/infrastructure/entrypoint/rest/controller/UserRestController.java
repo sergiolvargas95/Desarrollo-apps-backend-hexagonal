@@ -4,11 +4,13 @@ import com.jcaa.usersmanagement.application.port.in.CreateUserUseCase;
 import com.jcaa.usersmanagement.application.port.in.DeleteUserUseCase;
 import com.jcaa.usersmanagement.application.port.in.GetAllUsersUseCase;
 import com.jcaa.usersmanagement.application.port.in.GetUserByIdUseCase;
+import com.jcaa.usersmanagement.application.port.in.SearchUsersUseCase;
 import com.jcaa.usersmanagement.application.port.in.UpdateUserUseCase;
 import com.jcaa.usersmanagement.application.service.dto.command.CreateUserCommand;
 import com.jcaa.usersmanagement.application.service.dto.command.DeleteUserCommand;
 import com.jcaa.usersmanagement.application.service.dto.command.UpdateUserCommand;
 import com.jcaa.usersmanagement.application.service.dto.query.GetUserByIdQuery;
+import com.jcaa.usersmanagement.application.service.dto.query.SearchUsersQuery;
 import com.jcaa.usersmanagement.domain.model.UserModel;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.CreateUserRestRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.UpdateUserRestRequest;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +42,7 @@ public class UserRestController implements UserRestControllerDocs {
   private final DeleteUserUseCase deleteUserUseCase;
   private final GetUserByIdUseCase getUserByIdUseCase;
   private final GetAllUsersUseCase getAllUsersUseCase;
+  private final SearchUsersUseCase searchUsersUseCase;
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -51,6 +55,14 @@ public class UserRestController implements UserRestControllerDocs {
   @GetMapping
   public List<UserRestResponse> getAll() {
     return UserRestMapper.toResponseList(getAllUsersUseCase.execute());
+  }
+
+  @GetMapping("/search")
+  public List<UserRestResponse> search(
+      @RequestParam(required = false) final String nombre,
+      @RequestParam(required = false) final String email) {
+    final SearchUsersQuery query = UserRestMapper.toSearchQuery(nombre, email);
+    return UserRestMapper.toResponseList(searchUsersUseCase.execute(query));
   }
 
   @GetMapping("/{id}")
@@ -76,4 +88,3 @@ public class UserRestController implements UserRestControllerDocs {
     deleteUserUseCase.execute(command);
   }
 }
-
