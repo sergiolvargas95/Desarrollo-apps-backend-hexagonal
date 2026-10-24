@@ -1,0 +1,32 @@
+# Evita copiar archivos innecesarios al contexto de build de Docker.
+# Reduce el tamaño del contexto y acelera la construcción.
+
+# Artefactos de compilación (el build los genera internamente)
+target/
+
+# Control de versiones
+.git/
+.gitignore
+
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+
+# Kiro
+.kiro/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Documentación y scripts locales que no necesita el contenedor
+README.md
+AGENTS.md
+postman/
+setup-maven-path.ps1

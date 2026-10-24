@@ -1,24 +1,20 @@
 -- =============================================
--- Script de creación de la base de datos
--- Gestión de Usuarios - Arquitectura Hexagonal
+-- Script de creación del schema
+-- Gestión de Usuarios y Cursos — PostgreSQL
 -- =============================================
 
-CREATE DATABASE IF NOT EXISTS crud_usuarios
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE crud_usuarios;
-
+-- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS users (
     id          VARCHAR(36)  NOT NULL PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
     email       VARCHAR(150) NOT NULL UNIQUE,
     password    VARCHAR(255) NOT NULL,
-    role        ENUM('ADMIN', 'MEMBER', 'REVIEWER') NOT NULL,
-    status      ENUM('ACTIVE', 'INACTIVE', 'PENDING', 'BLOCKED') NOT NULL DEFAULT 'PENDING',
-    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    role        VARCHAR(20)  NOT NULL CHECK (role IN ('ADMIN', 'MEMBER', 'REVIEWER')),
+    status      VARCHAR(20)  NOT NULL DEFAULT 'PENDING'
+                    CHECK (status IN ('ACTIVE', 'INACTIVE', 'PENDING', 'BLOCKED')),
+    created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMP NOT NULL DEFAULT NOW()
+);
 
 -- Usuario administrador inicial (password: Admin1234!)
 INSERT INTO users (id, name, email, password, role, status)
@@ -29,9 +25,7 @@ VALUES (
     '$2a$12$placeholderHashReplaceWithRealBCryptHash',
     'ADMIN',
     'ACTIVE'
-);
-
-
+) ON CONFLICT (id) DO NOTHING;
 
 -- =============================================
 -- Tabla de Cursos
@@ -40,12 +34,14 @@ VALUES (
 CREATE TABLE IF NOT EXISTS cursos (
     id          VARCHAR(36)  NOT NULL PRIMARY KEY,
     nombre      VARCHAR(150) NOT NULL,
-    codigo       VARCHAR(50)  NOT NULL UNIQUE,
+    codigo      VARCHAR(50)  NOT NULL UNIQUE,
     descripcion TEXT         NOT NULL,
     institucion VARCHAR(150) NOT NULL,
     ubicacion   VARCHAR(255) NOT NULL,
-    modalidad   ENUM('VIRTUAL', 'PRESENCIAL', 'SEMIPRESENCIAL') NOT NULL,
-    nivel       ENUM('BASICO', 'INTERMEDIO', 'AVANZADO')        NOT NULL,
-    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    modalidad   VARCHAR(20)  NOT NULL
+                    CHECK (modalidad IN ('VIRTUAL', 'PRESENCIAL', 'SEMIPRESENCIAL')),
+    nivel       VARCHAR(20)  NOT NULL
+                    CHECK (nivel IN ('BASICO', 'INTERMEDIO', 'AVANZADO')),
+    created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMP NOT NULL DEFAULT NOW()
+);
