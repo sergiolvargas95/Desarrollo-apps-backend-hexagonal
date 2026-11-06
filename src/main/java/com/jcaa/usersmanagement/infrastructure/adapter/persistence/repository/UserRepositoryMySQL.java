@@ -134,10 +134,10 @@ public class UserRepositoryMySQL
 
     final List<String> conditions = new ArrayList<>();
     if (nombre.isPresent()) {
-      conditions.add("name LIKE ?");
+      conditions.add("name ILIKE ?");
     }
     if (email.isPresent()) {
-      conditions.add("email LIKE ?");
+      conditions.add("email ILIKE ?");
     }
 
     final String sql =
